@@ -1,4 +1,4 @@
-# todoblock_mobile_app
+# ToDoBlock
 
 The only productivity app you need.
 
