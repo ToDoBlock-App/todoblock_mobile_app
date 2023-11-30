@@ -1,11 +1,18 @@
+import 'package:todoblock_mobile_app/src/features/authentication/domain/models/auth_user_model.dart';
 import 'package:todoblock_mobile_app/src/features/authentication/domain/models/user_model.dart';
+export 'auth_repo.dart';
 
 abstract class AuthRepository {
 
-  UserModel login();
+  Future<UserModel> login(AuthUserModel authUserModel);
 
-  UserModel register();
+  Future<UserModel> register(AuthUserModel authUserModel);
 
-  bool validateSession();
+  Future<bool> validateSession(String session);
 
+  Future<void> logout();
+
+  Future<void> createUser(UserModel userModel);
+
+  Future<UserModel> getUser(String uuid);
 }

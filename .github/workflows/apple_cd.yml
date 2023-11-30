@@ -45,6 +45,9 @@ jobs:
         env:
           PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      - name: Create .env file
+        run: echo "YOUR_SUPABASE_URL=${{ secrets.YOUR_SUPABASE_URL }}\nYOUR_SUPABASE_ANON_KEY=${{ secrets.YOUR_SUPABASE_ANON_KEY }}" > .env
+
       - name: Deploy to TestFlight
         if: github.ref == 'refs/heads/release'
         run: cd ./ios && fastlane ios beta
@@ -63,3 +66,5 @@ jobs:
       MATCH_KEYCHAIN_NAME: ${{ secrets.MATCH_KEYCHAIN_NAME }}
       MATCH_KEYCHAIN_PASSWORD: ${{ secrets.MATCH_KEYCHAIN_PASSWORD }}
       DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS: ${{ secrets.DELIVER_ITMSTRANSPORTER_ADDITIONAL_UPLOAD_PARAMETERS }}
+      YOUR_SUPABASE_URL: ${{ secrets.YOUR_SUPABASE_URL }}
+      YOUR_SUPABASE_ANON_KEY: ${{ secrets.YOUR_SUPABASE_ANON_KEY }}

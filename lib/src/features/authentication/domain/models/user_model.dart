@@ -1,38 +1,79 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 class UserModel {
-  late int uuid;
-  late Membership membership;
-  late Mode mode;
-  late int todoblock_duration;
-  late bool direct_reschedule;
-  late bool offline_mode;
-  late DateTime wakeup_time;
-  late DateTime sleep_time;
-  late bool specific_icon;
-  Color primaryColor = Color(0xFFFFFFFF);
-  late String background_design_raw;
+  String? uuid;
+  Membership? membership;
+  Mode? mode;
+  int? todoblock_duration;
+  bool? direct_reschedule;
+  bool? offline_mode;
+  TimeOfDay? wakeup_time;
+  TimeOfDay? sleep_time;
+  bool? specific_icon;
+  Color? primaryColor;
+  String? background_design_raw;
 
   UserModel({
-    required this.uuid,
-    required this.membership,
-    required this.mode,
-    required this.todoblock_duration,
-    required this.direct_reschedule,
-    required this.offline_mode,
-    required this.wakeup_time,
-    required this.sleep_time,
-    required this.specific_icon,
+    this.uuid,
+    this.membership,
+    this.mode,
+    this.todoblock_duration,
+    this.direct_reschedule,
+    this.offline_mode,
+    this.wakeup_time,
+    this.sleep_time,
+    this.specific_icon,
     this.primaryColor = const Color(0xFFFFFFFF),
-    required this.background_design_raw,
+    this.background_design_raw,
   });
+
+  UserModel.fromJson(Map<String, dynamic> json) {
+    DateTime now = new DateTime.now();
+
+    uuid = json['uuid'];
+    membership = parseMembership(json['membership']);
+    mode = parseMode(json['mode']);
+    todoblock_duration = json['todoblock_duration'];
+    direct_reschedule = json['direct_reschedule'];
+    offline_mode = json['offline_mode'];
+    wakeup_time = json['wakeup_time'] != null ? TimeOfDay(hour:int.parse(json['wakeup_time'].split(":")[0]),minute: int.parse(json['wakeup_time'].split(":")[1])) : null;
+    sleep_time = json['sleep_time'] != null ? TimeOfDay(hour:int.parse(json['sleep_time'].split(":")[0]),minute: int.parse(json['sleep_time'].split(":")[1])) : null;
+    specific_icon = json['specific_icon'];
+    primaryColor = json['primaryColor'] != null ? Color(json['primaryColor']) : const Color(0xFFFFFFFF);
+    background_design_raw = json['background_design_raw'];
+  }
+
+  Membership parseMembership(String membership){
+    switch(membership){
+      case "FREE":
+        return Membership.FREE;
+      case "PRO":
+        return Membership.PRO;
+      case "PREMIUM":
+        return Membership.PREMIUM;
+      default:
+        return Membership.FREE;
+    }
+  }
+
+  Mode parseMode(String modus){
+    switch(modus){
+      case "BUSINESS":
+        return Mode.BUSINESS;
+      case "PERSONAL":
+        return Mode.PERSONAL;
+      default:
+        return Mode.PERSONAL;
+    }
+  }
 
   get background_design {
     if(true){ //background design a cached asset reference
-      //return image
+      return AssetImage("assets/TDB_SplashScreen.png");
     }
 
-    if(isValidUrl(background_design_raw)){ //background design a link
+    if(background_design_raw != null && isValidUrl(background_design_raw!)){ //background design a link
       //return image
     }
   }
@@ -47,6 +88,22 @@ class UserModel {
     }
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'uuid': uuid,
+      'membership': membership?.toString(), // Assuming Membership has a toJson method
+      'mode': mode?.toString(), // Assuming Mode has a toJson method
+      'todoblock_duration': todoblock_duration,
+      'direct_reschedule': direct_reschedule,
+      'offline_mode': offline_mode,
+      'wakeup_time': wakeup_time?.toString(),
+      'sleep_time': sleep_time?.toString(),
+      'specific_icon': specific_icon,
+      'primaryColor': primaryColor?.value,
+      'background_design_raw': background_design_raw,
+    };
+  }
+
 }
 
 enum Membership {
@@ -55,4 +112,17 @@ enum Membership {
 
 enum Mode {
   BUSINESS, PERSONAL
+}
+
+extension ModeFromString on String{
+  Mode parseMode(){
+    switch(this){
+      case "BUSINESS":
+        return Mode.BUSINESS;
+      case "PERSONAL":
+        return Mode.PERSONAL;
+      default:
+        return Mode.PERSONAL;
+    }
+  }
 }

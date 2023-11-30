@@ -4,7 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 class LogoText extends StatefulWidget {
   final String text;
-  const LogoText({Key? key, required this.text}) : super(key: key);
+  bool animation = true;
+  LogoText({Key? key, required this.text, this.animation = true}) : super(key: key);
 
   @override
   State<LogoText> createState() => _LogoTextState();
@@ -19,7 +20,7 @@ class _LogoTextState extends State<LogoText> with SingleTickerProviderStateMixin
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 600),
+      duration: Duration(milliseconds: widget.animation ? 600 : 0),
       vsync: this,
     );
     _animation = Tween(begin: 0.0, end: 1.0).animate(_controller);
@@ -41,7 +42,6 @@ class _LogoTextState extends State<LogoText> with SingleTickerProviderStateMixin
       child: Text(
         widget.text,
         style: GoogleFonts.vibes(
-          decoration: TextDecoration.underline,
           height: 1,
           letterSpacing:3,
           fontWeight: FontWeight.normal,

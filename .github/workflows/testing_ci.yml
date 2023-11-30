@@ -20,5 +20,13 @@ jobs:
           flutter-version: '3.10.5'
       - name: Get dependencies
         run: flutter pub get
+
+      - name: Create .env file
+        run: echo "YOUR_SUPABASE_URL=${{ secrets.YOUR_SUPABASE_URL }}\nYOUR_SUPABASE_ANON_KEY=${{ secrets.YOUR_SUPABASE_ANON_KEY }}" > .env
+
       - name: Run tests
         run: flutter test
+
+    env:
+      YOUR_SUPABASE_URL: ${{ secrets.YOUR_SUPABASE_URL }}
+      YOUR_SUPABASE_ANON_KEY: ${{ secrets.YOUR_SUPABASE_ANON_KEY }}
