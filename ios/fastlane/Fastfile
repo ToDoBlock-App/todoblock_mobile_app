@@ -1,0 +1,61 @@
+#update_fastlane
+
+default_platform(:ios)
+
+platform :ios do
+    desc "Push a new beta build to TestFlight"
+    lane :beta do
+        if is_ci
+            create_keychain(
+              name: ENV['MATCH_KEYCHAIN_NAME'],
+              password: ENV["MATCH_KEYCHAIN_PASSWORD"],
+              default_keychain: true,
+              unlock: true,
+              timeout: 3600,
+              lock_when_sleeps: false
+            )
+        end
+
+        match(
+          type: "appstore",
+          readonly: is_ci,
+          keychain_name: ENV['MATCH_KEYCHAIN_NAME'],
+          keychain_password: ENV["MATCH_KEYCHAIN_PASSWORD"],
+        )
+
+        increment_build_number(xcodeproj: "Runner.xcodeproj")
+        build_app(workspace: "Runner.xcworkspace", scheme: "Runner", export_method: "app-store")
+        upload_to_testflight
+    end
+
+    desc "Deploy a new version to the App Store"
+    lane :release do
+        if is_ci
+        create_keychain(
+          name: ENV['MATCH_KEYCHAIN_NAME'],
+          password: ENV["MATCH_KEYCHAIN_PASSWORD"],
+          default_keychain: true,
+          unlock: true,
+          timeout: 3600,
+          lock_when_sleeps: false
+        )
+        end
+
+        match(
+        type: "appstore",
+        readonly: is_ci,
+        keychain_name: ENV['MATCH_KEYCHAIN_NAME'],
+        keychain_password: ENV["MATCH_KEYCHAIN_PASSWORD"],
+        )
+
+        increment_version_number(xcodeproj: "Runner.xcodeproj")
+        increment_build_number(xcodeproj: "Runner.xcodeproj")
+        build_app(workspace: "Runner.xcworkspace", scheme: "Runner", export_method: "app-store")
+
+        deliver(
+        force: true, # Set to false to disable automatic submission
+        skip_metadata: true,
+        skip_screenshots: true
+        )
+    end
+end

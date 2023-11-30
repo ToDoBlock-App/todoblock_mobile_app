@@ -1,0 +1,7 @@
+app_identifier("app.todoblock.todoblockMobileApp") # The bundle identifier of your app
+apple_id("accounts@todoblock.app") # Your Apple Developer Portal username
+
+itc_team_id(ENV['ITC_TEAM_ID'])
+team_id(ENV['TEAM_ID'])
+
+
