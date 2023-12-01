@@ -6,6 +6,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 import 'package:todoblock_mobile_app/src/common/widget/logo_text.dart';
 import 'package:todoblock_mobile_app/src/common/widget/tdb_button.dart';
 import 'package:todoblock_mobile_app/src/common/widget/tdb_link.dart';
@@ -30,7 +31,8 @@ class _LoginPageState extends State<LoginPage> {
   String _password = '';
 
    Future<void> _login() async {
-    if (_formKey.currentState!.validate()) {
+     context.loaderOverlay.show();
+     if (_formKey.currentState!.validate()) {
       await authCubit.signIn(_email, _password);
     }
   }
@@ -42,6 +44,10 @@ class _LoginPageState extends State<LoginPage> {
     });
     super.initState();
     authCubit.stream.listen((state) {
+      if(state is SignedIn){
+        context.go("/list");
+      }
+
       if(state is SignInFailed){
         InAppNotification.showTDBSnackbar(context, "Login Failed", "Check your E-Mail and Password", color: Colors.red);
       }
@@ -65,7 +71,7 @@ class _LoginPageState extends State<LoginPage> {
             Spacer(),
             Column(
               children: [
-                LogoText(text: "ToDo\nBlock"),
+                LogoText(text: "ToDo\nBlock", animation: false,),
                 Text(
                     "The Productivity App",
                   style: GoogleFonts.urbanist(

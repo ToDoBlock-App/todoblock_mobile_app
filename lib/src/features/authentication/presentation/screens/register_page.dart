@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:get/get.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 
 import 'package:todoblock_mobile_app/src/common/widget/logo_text.dart';
 import 'package:todoblock_mobile_app/src/common/widget/tdb_button.dart';
@@ -29,6 +30,7 @@ class _RegisterPageState extends State<RegisterPage> {
   String _confirmPassword = '';
 
   Future<void> _register() async {
+    context.loaderOverlay.show();
     if (_formKey.currentState!.validate()) {
       await authCubit.signUp(_email, _password);
     }
@@ -36,9 +38,11 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     authCubit.stream.listen((state) {
+      if(state is SignedUp){
+        context.go("/list");
+      }
       if(state is SignUpFailed){
         InAppNotification.showTDBSnackbar(context, "Sign Up Failed", "Please try it again.", color: Colors.red);
       }
@@ -62,7 +66,7 @@ class _RegisterPageState extends State<RegisterPage> {
             Spacer(),
             Column(
               children: [
-                LogoText(text: "ToDo\nBlock"),
+                LogoText(text: "ToDo\nBlock", animation: false,),
                 Text(
                   "The Productivity App",
                   style: GoogleFonts.urbanist(
