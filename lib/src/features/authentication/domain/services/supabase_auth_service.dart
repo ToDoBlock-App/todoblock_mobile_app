@@ -1,7 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:todoblock_mobile_app/src/features/authentication/domain/models/auth_user_model.dart';
 import 'package:todoblock_mobile_app/src/features/authentication/domain/models/user_model.dart';
-import 'package:todoblock_mobile_app/src/utils/formatting.dart';
 
 import '../repositories/auth_repo.dart';
 
