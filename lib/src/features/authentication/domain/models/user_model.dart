@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
+import '../../../todoblocks/domain/models/to_do_block_model.dart';
+import '../../../todos/domain/models/todo_model.dart';
+
 class UserModel {
   String? uuid;
   Membership? membership;

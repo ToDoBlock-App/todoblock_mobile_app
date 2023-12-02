@@ -15,7 +15,7 @@ import 'package:todoblock_mobile_app/src/features/todos/presentation/screens/cre
 import 'package:todoblock_mobile_app/src/features/todos/presentation/screens/details_todo_page.dart';
 import 'package:todoblock_mobile_app/src/features/todos/presentation/screens/todolist_page.dart';
 
-import '../common/singleton/session_data.dart';
+import '../common/singleton/session_storage.dart';
 import '../features/authentication/presentation/screens/login_page.dart';
 import '../features/authentication/presentation/screens/register_page.dart';
 
