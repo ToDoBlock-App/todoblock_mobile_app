@@ -6,7 +6,8 @@ class LogoText extends StatefulWidget {
   final String text;
   bool animation = true;
   Function? animationDone;
-  LogoText({Key? key, required this.text, this.animation = true, this.animationDone}) : super(key: key);
+  double fontSize;
+  LogoText({Key? key, required this.text, this.animation = true, this.animationDone, this.fontSize = 64}) : super(key: key);
 
   @override
   State<LogoText> createState() => _LogoTextState();
@@ -45,14 +46,21 @@ class _LogoTextState extends State<LogoText> with SingleTickerProviderStateMixin
 
     return FadeTransition(
       opacity: _animation,
-      child: Text(
-        widget.text,
-        style: GoogleFonts.vibes(
-          height: 1,
-          letterSpacing:3,
-          fontWeight: FontWeight.normal,
-          fontSize: 64,
-          color: Colors.black,
+      child: FittedBox(
+        child: Text(
+          widget.text,
+          style: GoogleFonts.vibes(
+            //height: 1,
+            letterSpacing:3,
+            fontWeight: FontWeight.normal,
+            fontSize: widget.fontSize,
+            color: Colors.black,
+            //backgroundColor: Colors.yellow
+          ),
+          strutStyle: StrutStyle(
+            fontSize: widget.fontSize,
+            height: .9, // Adjust this value
+          ),
         ),
       ),
     );

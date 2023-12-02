@@ -43,7 +43,7 @@ final GoRouter _router = GoRouter(
       path: "/",
       routes: _protectedRoutes,
       redirect: (BuildContext context, GoRouterState state) async {
-        final sessionData = SessionData();
+        final sessionData = SessionStorageManager();
         if (await sessionData.sessionIsValid()) {
           return null;
         }

@@ -7,6 +7,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:todoblock_mobile_app/src/features/authentication/domain/repositories/auth_repo.dart';
 import 'package:todoblock_mobile_app/src/features/authentication/domain/services/supabase_auth_service.dart';
 import 'package:todoblock_mobile_app/src/features/authentication/provider/auth_cubit.dart';
+import 'package:todoblock_mobile_app/src/features/todos/domain/repositories/todo_repo.dart';
+import 'package:todoblock_mobile_app/src/features/todos/domain/services/supabase_todo_service.dart';
+import 'package:todoblock_mobile_app/src/features/todos/provider/todos_cubit.dart';
 import 'package:todoblock_mobile_app/src/routing/app_entry.dart';
 import 'package:todoblock_mobile_app/src/utils/secure_local_storage.dart';
 
@@ -27,4 +30,7 @@ Future<void> main() async {
 void manageDependencies() {
   Get.lazyPut<AuthRepository>(() => SupabaseAuthService());
   Get.lazyPut(() => AuthCubit(Landing()));
+
+  Get.lazyPut<ToDoRepository>(() => SupabaseToDoService());
+  Get.lazyPut<ToDosCubit>(() => ToDosCubit(ToDoInitState()));
 }
