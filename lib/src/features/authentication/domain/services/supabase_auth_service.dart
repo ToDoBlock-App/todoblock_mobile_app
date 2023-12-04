@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:todoblock_mobile_app/src/features/authentication/domain/models/auth_user_model.dart';
 import 'package:todoblock_mobile_app/src/features/authentication/domain/models/user_model.dart';
@@ -23,8 +25,9 @@ class SupabaseAuthService extends AuthRepository{
   }
 
   @override
-  Future<void> logout() async {
+  Future<void> logout(Function? callback) async {
     await supabase.auth.signOut();
+    if(callback != null) callback.call();
   }
 
   @override

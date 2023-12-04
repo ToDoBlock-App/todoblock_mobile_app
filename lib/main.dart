@@ -13,6 +13,7 @@ import 'package:todoblock_mobile_app/src/features/todos/provider/todos_cubit.dar
 import 'package:todoblock_mobile_app/src/routing/app_entry.dart';
 import 'package:todoblock_mobile_app/src/utils/secure_local_storage.dart';
 
+
 Future<void> main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env"); // Choose the file based on the environment

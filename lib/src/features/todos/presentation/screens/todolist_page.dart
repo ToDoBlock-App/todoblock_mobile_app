@@ -3,16 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loader_overlay/loader_overlay.dart';
-import 'package:todoblock_mobile_app/src/common/singleton/session_storage.dart';
 import 'package:todoblock_mobile_app/src/common/widget/logo_text.dart';
-import 'package:todoblock_mobile_app/src/features/todos/domain/repositories/todo_repo.dart';
+import 'package:todoblock_mobile_app/src/features/authentication/domain/repositories/auth_repo.dart';
 import 'package:todoblock_mobile_app/src/features/todos/presentation/widgets/to_do_card.dart';
 import 'package:todoblock_mobile_app/src/features/todos/presentation/widgets/to_do_separator.dart';
 import 'package:todoblock_mobile_app/src/features/todos/provider/todos_cubit.dart';
-
-import '../../../authentication/domain/models/user_model.dart';
 import '../../domain/models/todo_model.dart';
 
 class ToDoListPage extends StatefulWidget {
@@ -23,26 +21,25 @@ class ToDoListPage extends StatefulWidget {
 }
 
 class _ToDoListPageState extends State<ToDoListPage> {
- // final UserModel user = SessionStorageManager().currentUser;
-
-  ToDoRepository todoRepo = Get.find();
   ToDosCubit toDosCubit = Get.find();
 
-  Widget _buildToDoList(List<ToDoModel> todos, List<ToDoModel> laterTodos) {
-    List<Widget> todoWidgets = [];
+  bool _todosRead = false;
+
+  Widget _buildToDoList(List<ToDoModel> _sortedToDos, List<ToDoModel> _laterToDos) {
+    List<Widget> _todoWidgets = [];
 
     // Adding todos
-    for (var todo in todos) {
-      todoWidgets.add(ToDoCard(
+    for (var todo in _sortedToDos) {
+      _todoWidgets.add(ToDoCard(
         title: todo.title ?? "ToDo",
         todo: todo,
         later: false,
       ));
     }
 
-    // Adding a divider if there are any later todos
-    if (laterTodos.isNotEmpty) {
-      todoWidgets.add(Padding(
+    // Adding a divider if there are any todos for later and now
+    if(_laterToDos.isNotEmpty && _sortedToDos.isNotEmpty){
+      _todoWidgets.add(Padding(
         padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 8.0),
         child: ToDoSeparator(
           height: .4,
@@ -52,8 +49,8 @@ class _ToDoListPageState extends State<ToDoListPage> {
     }
 
     // Adding later todos with line-through style
-    for (var laterTodo in laterTodos) {
-      todoWidgets.add(ToDoCard(
+    for (var laterTodo in _laterToDos) {
+      _todoWidgets.add(ToDoCard(
         title: laterTodo.title ?? "Later ToDo",
         todo: laterTodo,
         later: true, // This will apply the line-through style
@@ -62,28 +59,21 @@ class _ToDoListPageState extends State<ToDoListPage> {
 
     return ListView(
       padding: EdgeInsets.zero,
-      children: todoWidgets,
+      children: _todoWidgets,
     );
   }
-
 
   @override
   void initState() {
     super.initState();
-    if(context.loaderOverlay.visible){
-      context.loaderOverlay.hide();
-    }
-
     toDosCubit.readToDosFromLoggedInUser();
+    _todosRead = true;
   }
 
   @override
   Widget build(BuildContext context) {
-   // final String uuid = user.uuid ?? "Error";
-
     return Scaffold(
       extendBodyBehindAppBar: true,
-
       appBar: AppBar(
         centerTitle: false,
         title: Padding(
@@ -96,10 +86,14 @@ class _ToDoListPageState extends State<ToDoListPage> {
         ),
         actions: [
           IconButton(
-            onPressed: () {  },
+            onPressed: () {
+              AuthRepository authRepo = Get.find();
+              context.loaderOverlay.show();
+              authRepo.logout(() => context.go("/list"));
+            },
             icon:
             Icon(
-              Icons.settings,
+              Icons.logout,
               color: Colors.black,
               size: 34,
             ),
@@ -107,7 +101,7 @@ class _ToDoListPageState extends State<ToDoListPage> {
           SizedBox(width: 20,)
         ],
         backgroundColor: Colors.transparent,
-        systemOverlayStyle: SystemUiOverlayStyle.dark   ,
+        systemOverlayStyle: SystemUiOverlayStyle.dark,
         elevation: 0,
       ),
       body: Container(
@@ -154,14 +148,11 @@ class _ToDoListPageState extends State<ToDoListPage> {
                 print(state);
                 if(state is ReadingToDos){
                   return Center(child: CircularProgressIndicator());
-                }
-
-                if(state is ToDosRead){
-                  var todos = state.todos[0];
-                  //List<ToDoModel> dailyGoals = todos.take(3).toList();
-                  //Get Daily Goals Only
+                }else if(state is LoadingToDoData){
+                  return Center(child: CircularProgressIndicator(color: Colors.black,));
+                }else if(state is ToDosRead){
                   return Column(
-                    children: todos.map((todo) => ToDoCard(title: todo.title ?? "ToDo", goal: true, todo: todo)).toList(),
+                    children: state.goalTodos.map((todo) => ToDoCard(title: todo.title ?? "ToDo", goal: true, todo: todo)).toList(),
                   );
                 }
 
@@ -179,27 +170,12 @@ class _ToDoListPageState extends State<ToDoListPage> {
               child: BlocBuilder<ToDosCubit, ToDosState>(
                 bloc: toDosCubit,
                 builder: (context, state){
-                  print(state);
                   if(state is ReadingToDos){
                     return Center(child: CircularProgressIndicator());
-                  }
-
-                  if(state is ToDosRead){
-                    var laterTodos = state.todos[1];
-                    var todos = state.todos[2];
-                    return _buildToDoList(todos, laterTodos);
-                    // return ListView.builder(
-                    //   padding: EdgeInsets.zero,
-                    //   itemCount: todos.length,
-                    //   itemBuilder: (context, index) {
-                    //     var todo = todos[index];
-                    //     var title = todo.title;
-                    //     if(title == null){
-                    //       return null;
-                    //     }
-                    //     return ToDoCard(title: title, todo: todo,);
-                    //   }
-                    // );
+                  }else if(state is LoadingToDoData){
+                    return Center(child: CircularProgressIndicator(color: Colors.black,));
+                  }else if(state is ToDosRead){
+                    return _buildToDoList(state.todayTodos, state.laterTodos);
                   }
 
                   return Container();

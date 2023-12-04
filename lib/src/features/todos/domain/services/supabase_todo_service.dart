@@ -1,61 +1,62 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:todoblock_mobile_app/src/features/authentication/domain/models/user_model.dart';
 import 'package:todoblock_mobile_app/src/features/todos/domain/models/todo_model.dart';
+import 'package:todoblock_mobile_app/src/features/todos/domain/models/workday_model.dart';
 import 'package:todoblock_mobile_app/src/features/todos/domain/repositories/todo_repo.dart';
 
 class SupabaseToDoService extends ToDoRepository{
 
   final supabase = Supabase.instance.client;
 
+
   @override
-  bool deleteToDo(ToDoModel toDoModel) {
-    // TODO: implement deleteToDo
-    throw UnimplementedError();
+  Stream<List<WorkdayModel>> readUnfinishedToDos() {
+      return supabase
+          .from("workdays")
+          .stream(primaryKey: ['id'])
+          .eq("finished", false)
+          .asyncMap((unfinishedToDos) async {
+            List<WorkdayModel> workdayTodos = [];
+            for(Map<String, dynamic> rawWorkday in unfinishedToDos){
+              var workday = WorkdayModel(ToDoModel(id: rawWorkday['todo_id']), rawWorkday['goal'], rawWorkday['later'], rawWorkday['finished'], DateTime.parse(rawWorkday['date']));
+              workdayTodos.add(workday);
+            }
+            return workdayTodos;
+      });
   }
 
-  //3 Listen?
-  //ToDo Liste mit Daily Goals
-  //ToDo Liste sortiert nach Prios
-  //ToDo Liste mit do it later true
-
   @override
-  Stream<dynamic> readToDos(UserModel userModel) {
-    String? uuid = userModel.uuid;
+  Stream<List<ToDoModel>> readToDoUpdates(List<WorkdayModel> workdaysTodo) {
+    var todosUUID = workdaysTodo.map((workdayTodo) => workdayTodo.refToDo.id).toList();
+
     return supabase
         .from("todos")
         .stream(primaryKey: ['id'])
-        .order("priority", ascending: false)
-        .eq("user_id", uuid)
-        .map((data){
-          //print(data);
-          List<ToDoModel> resultOpen = [];
-
-
-          List<ToDoModel> dailyGoals = [];
-          List<ToDoModel> laterToDos = [];
-          List<ToDoModel> sortedToDos = [];
-          for(Map<String, dynamic> todoData in data){
-            if(todoData['dailygoal'] != null && true){//Todays Date in List
-              dailyGoals.add(ToDoModel.fromJson(todoData));
-              continue;
-            }
-
-            if(todoData['do_it_later'] == true){
-              laterToDos.add(ToDoModel.fromJson(todoData));
-              continue;
-            }
-
-            sortedToDos.add(ToDoModel.fromJson(todoData));
+        .inFilter("id", todosUUID)
+        .map((rawTodos){
+          //print(rawTodos);
+          List<ToDoModel> todos = [];
+          for(Map<String, dynamic> rawTodo in rawTodos){
+            ToDoModel todo = ToDoModel.fromJson(rawTodo);
+            WorkdayModel refWorkday = workdaysTodo.firstWhere((workdayTodo) => workdayTodo.refToDo.id == todo.id);
+            todo.finished = refWorkday.finished;
+            todo.later = refWorkday.later;
+            todo.dailygoal = refWorkday.dailygoal;
+            todos.add(todo);
           }
-
-          return [dailyGoals, laterToDos, sortedToDos];
+          return todos;
     });
   }
 
   @override
-  Future<ToDoModel> getToDo(ToDoModel toDoModel) {
-    // TODO: implement getToDo
+  List<ToDoModel> readFinishedToDos() {
+    // TODO: implement readFinishedToDos
     throw UnimplementedError();
+  }
+
+  @override
+  Future<ToDoModel> getToDo(ToDoModel toDoModel) async {
+    var rawTodo = await supabase.from("todos").select('*').eq('id', toDoModel.id);
+    return ToDoModel.fromJson(rawTodo[0]);
   }
 
   @override
@@ -67,6 +68,12 @@ class SupabaseToDoService extends ToDoRepository{
   @override
   Future<ToDoModel> updateToDo(ToDoModel toDoModel) {
     // TODO: implement updateToDo
+    throw UnimplementedError();
+  }
+
+  @override
+  bool deleteToDo(ToDoModel toDoModel) {
+    // TODO: implement deleteToDo
     throw UnimplementedError();
   }
 
