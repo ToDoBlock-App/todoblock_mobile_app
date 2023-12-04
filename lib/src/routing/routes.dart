@@ -43,6 +43,9 @@ final GoRouter _router = GoRouter(
       path: "/",
       routes: _protectedRoutes,
       redirect: (BuildContext context, GoRouterState state) async {
+        if(context.loaderOverlay.visible) {
+          context.loaderOverlay.hide();
+        }
         final sessionData = SessionStorageManager();
         if (await sessionData.sessionIsValid()) {
           return null;

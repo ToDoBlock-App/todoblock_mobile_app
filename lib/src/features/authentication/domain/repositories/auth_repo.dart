@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:todoblock_mobile_app/src/features/authentication/domain/models/auth_user_model.dart';
 import 'package:todoblock_mobile_app/src/features/authentication/domain/models/user_model.dart';
 export 'auth_repo.dart';
@@ -10,7 +11,7 @@ abstract class AuthRepository {
 
   Future<bool> validateSession(String session);
 
-  Future<void> logout();
+  Future<void> logout(Function? callback);
 
   Future<void> createUser(UserModel userModel);
 

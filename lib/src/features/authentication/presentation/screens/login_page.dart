@@ -50,6 +50,7 @@ class _LoginPageState extends State<LoginPage> {
 
       if(state is SignInFailed){
         InAppNotification.showTDBSnackbar(context, "Login Failed", "Check your E-Mail and Password", color: Colors.red);
+        context.go("/list");
       }
     });
   }
