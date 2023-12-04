@@ -7,9 +7,10 @@ class ToDoModel {
   String? description;
   int? duration;
   int? deadline;
-  List<int>? dailygoal;
+  bool dailygoal = false;
+  bool later = false;
   Priority? priority;
-  int? finished;
+  bool finished = false;
 
   ToDoModel({
     this.id,
@@ -17,35 +18,27 @@ class ToDoModel {
     this.description,
     this.duration,
     this.deadline,
-    this.dailygoal,
+    this.dailygoal = false,
+    this.later = false,
     this.priority,
-    this.finished,
+    this.finished = false,
   });
 
-  factory ToDoModel.fromJson(Map<String, dynamic> json) {
-    List<int> dailygoal = [];
+  ToDoModel.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    title = json['title'];
+    description = json['description'];
+    duration = (json['duration']) as int;
+    deadline = json['deadline'] == null ? TimestampExtension.fromDateTime((json['deadline'] as int?).toDateTimeUtc) : null;
+    priority = (json['priority'] as int).toPriority();
+  }
 
-    if(json['dailygoal'] != null){
-      var jsonList = [];
-      for(dynamic goal in json['dailygoal']){
-        dailygoal.add(DateTime.parse(goal).millisecondsSinceEpoch);
-      }
-      // var jsonList = json['dailygoal']?.cast<int>();
-      // for(int element in jsonList){
-      //   dailygoal.add(TimestampExtension.fromDateTime((element).toDateTimeUtc));
-      // }
-    }
+  bool todaysGoal(){
+    return dailygoal;
+  }
 
-    return ToDoModel(
-      id: json['id'],
-      title: json['title'],
-      description: json['description'],
-      duration: (json['duration']) as int,
-      deadline:  json['deadline'] == null ? TimestampExtension.fromDateTime((json['deadline'] as int?).toDateTimeUtc) : null,
-      dailygoal: dailygoal.isEmpty? dailygoal : null,
-      priority: (json['priority'] as int).toPriority(),
-      finished:  json['finished'] == null ? TimestampExtension.fromDateTime((json['finished'] as int?).toDateTimeUtc) : null,
-    );
+  bool todaysToDo(){
+    return !later;
   }
 
   Map<String, dynamic> toJson() {
@@ -54,10 +47,25 @@ class ToDoModel {
       'title': title,
       'description': description,
       'duration': duration,
-      'deadline': deadline,
+      'deadline': deadline.toDateTimeUtc.toIso8601String(),
       'dailygoal': dailygoal,
+      'later': later,
       'priority': priority?.toInt(),
       'finished': finished,
     };
+  }
+
+  @override
+  String toString() {
+    return toJson().toString();
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if(other is ToDoModel){
+      var otherToDo = other as ToDoModel;
+      return id == otherToDo.id;
+    }
+    return false;
   }
 }

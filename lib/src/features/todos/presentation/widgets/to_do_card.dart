@@ -25,20 +25,17 @@ class _ToDoCardState extends State<ToDoCard> {
   bool _dismissEndToStart = false;
   bool _isExpanded = false;
   double _height = 70;
-  String description = "";
-  int duration = 0;
-  int deadline = 0;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    description = (widget.todo == null || widget.todo?.description == null ? "" : widget.todo?.description)!;
-    duration = (widget.todo == null || widget.todo?.duration == null ? 0 : widget.todo?.duration)!;
-    deadline = (widget.todo == null || widget.todo?.deadline == null ? 0 : widget.todo?.deadline)!;
   }
 
-  String _createDescription(){
+  String _createDescription() {
+    final description = widget.todo?.description ?? "";
+    final duration = widget.todo?.duration ?? 0;
+    final deadline = widget.todo?.deadline ?? 0;
     return "Deadline: $deadline Duration: $duration \n $description";
   }
 
@@ -144,7 +141,7 @@ class _ToDoCardState extends State<ToDoCard> {
                     ),
                   ),
                   Icon(
-                      widget.goal ? Icons.priority_high : Icons.adjust
+                      widget.goal ? Icons.priority_high : widget.later ? Icons.adjust : Icons.task_alt
                   ),
                   Padding(
                     padding: EdgeInsets.fromLTRB(12,0,12,0),

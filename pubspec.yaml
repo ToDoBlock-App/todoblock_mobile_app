@@ -49,6 +49,8 @@ dependencies:
   go_router: ^12.1.1
   flutter_svg: ^2.0.9
   loader_overlay: ^3.0.0
+  synchronized: ^3.1.0
+  timezone: ^0.9.2
 
 flutter_native_splash:
   fullscreen: true
